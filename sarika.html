@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gradient Builder</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            background: #222;
+            color: white;
+        }
+        .sidebar {
+            width: 300px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 4px 0 6px rgba(0, 0, 0, 0.2);
+        }
+        .controls label, .controls select, .controls input {
+            display: block;
+            margin: 10px 0;
+            font-size: 16px;
+            color: white;
+        }
+        .controls {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .copy-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #333;
+            border-radius: 10px;
+            text-align: left;
+            font-family: monospace;
+            word-wrap: break-word;
+        }
+        .copy-btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            border: none;
+            background: #ff5722;
+            color: white;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        .copy-btn:hover {
+            background: #e64a19;
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(90deg, #ff0000, #0000ff);
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Gradient Controls</h2>
+        <div class="controls">
+            <label for="gradient-type">Gradient Type:</label>
+            <select id="gradient-type" style="color: black;">
+                <option value="linear" style="color: black;">Linear</option>
+                <option value="radial" style="color: black;">Radial</option>
+                <option value="conic" style="color: black;">Conic</option>
+            </select>
+            <label for="color1">Color 1:</label>
+            <input type="color" id="color1" value="#ff0000">
+            <label for="color2">Color 2:</label>
+            <input type="color" id="color2" value="#0000ff">
+            <label for="angle">Angle:</label>
+            <input type="range" id="angle" min="0" max="360" value="90">
+            <label for="position-x">Position X:</label>
+            <input type="range" id="position-x" min="0" max="100" value="50">
+            <label for="position-y">Position Y:</label>
+            <input type="range" id="position-y" min="0" max="100" value="50">
+            <label for="intensity">Intensity:</label>
+            <input type="range" id="intensity" min="0" max="100" value="100">
+        </div>
+        <div class="copy-box" id="css-output"></div>
+        <button class="copy-btn" onclick="copyToClipboard()">Copy CSS</button>
+    </div>
+    <div class="main-content" id="gradient-section"></div>
+    
+    <script>
+        const gradientType = document.getElementById('gradient-type');
+        const color1 = document.getElementById('color1');
+        const color2 = document.getElementById('color2');
+        const angle = document.getElementById('angle');
+        const positionX = document.getElementById('position-x');
+        const positionY = document.getElementById('position-y');
+        const intensity = document.getElementById('intensity');
+        const gradientSection = document.getElementById('gradient-section');
+        const cssOutput = document.getElementById('css-output');
+
+        function updateGradient() {
+            let gradientStyle = '';
+            let position = `${positionX.value}% ${positionY.value}%`;
+            let alpha = intensity.value / 100;
+            
+            switch (gradientType.value) {
+                case 'linear':
+                    gradientStyle = `linear-gradient(${angle.value}deg, rgba(${hexToRgb(color1.value)}, ${alpha}), rgba(${hexToRgb(color2.value)}, ${alpha}))`;
+                    break;
+                case 'radial':
+                    gradientStyle = `radial-gradient(circle at ${position}, rgba(${hexToRgb(color1.value)}, ${alpha}), rgba(${hexToRgb(color2.value)}, ${alpha}))`;
+                    break;
+                case 'conic':
+                    gradientStyle = `conic-gradient(from ${angle.value}deg at ${position}, rgba(${hexToRgb(color1.value)}, ${alpha}), rgba(${hexToRgb(color2.value)}, ${alpha}))`;
+                    break;
+            }
+            gradientSection.style.background = gradientStyle;
+            cssOutput.textContent = `background: ${gradientStyle};`;
+        }
+
+        function hexToRgb(hex) {
+            let bigint = parseInt(hex.slice(1), 16);
+            let r = (bigint >> 16) & 255;
+            let g = (bigint >> 8) & 255;
+            let b = bigint & 255;
+            return `${r}, ${g}, ${b}`;
+        }
+
+        function copyToClipboard() {
+            navigator.clipboard.writeText(cssOutput.textContent).then(() => {
+                alert("CSS Copied to Clipboard!");
+            });
+        }
+
+        gradientType.addEventListener('change', updateGradient);
+        color1.addEventListener('input', updateGradient);
+        color2.addEventListener('input', updateGradient);
+        angle.addEventListener('input', updateGradient);
+        positionX.addEventListener('input', updateGradient);
+        positionY.addEventListener('input', updateGradient);
+        intensity.addEventListener('input', updateGradient);
+    </script>
+</body>
+</html>
